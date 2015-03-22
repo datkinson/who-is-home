@@ -32,9 +32,9 @@ class Devices(restful.Resource):
                 cursor.execute('''INSERT INTO users(name, device, address) VALUES(?,?,?)''', ("placeholder", name, addr))
                 db.commit()
             except sqlite3.IntegrityError as err:
-               print err
-                
-        db.close()
+                print err
+            finally:    
+                db.close()
         json_string = json.dumps(devices)
         return json_string
 

@@ -1,9 +1,17 @@
 from flask import Flask
 from flask.ext import restful
 import bluetooth, json
+import sqlite3
 
 app = Flask(__name__)
 api = restful.Api(app)
+db = sqlite3.connect('data.sqlite')
+cursor = db.cursor()
+cursor.execute('''
+    CREATE TABLE if not exists users(id INTEGER PRIMARY KEY, name TEXT,
+                       device TEXT, address TEXT unique)
+''')
+db.commit()
 
 class HelloWorld(restful.Resource):
     def get(self):
@@ -18,6 +26,8 @@ class Devices(restful.Resource):
             new_device["address"] = addr
             new_device["name"] = name
             devices.append(new_device.copy())
+            cursor.execute('''INSERT INTO users(name, device, address) VALUES(?,?,?)''', ("placeholder", name, addr))
+        db.commit()
         json_string = json.dumps(devices)
         return json_string
 
